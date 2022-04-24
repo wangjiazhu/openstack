@@ -1,0 +1,61 @@
+- name: controller 安装nova服务组件
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - openstack-nova-api
+      - openstack-nova-conductor
+      - openstack-nova-console
+      - openstack-nova-novncproxy
+      - openstack-nova-scheduler
+      - openstack-nova-placement-api
+  when: (ansible_hostname == "controller")
+
+- name: controller 修改配置文件/etc/nova/nova.conf
+  template:
+    src: controller_nova.conf
+    dest: /etc/nova/nova.conf
+    owner: root
+    group: nova
+    mode: '0640'
+  when: (ansible_hostname == "controller")
+
+- name: controller 修改配置文件/etc/httpd/conf.d/00-nova-placement-api.conf
+  copy:
+    src: controller_00-nova-placement-api.conf
+    dest: /etc/httpd/conf.d/00-nova-placement-api.conf
+    owner: root
+    group: root
+    mode: '0640'
+  when: (ansible_hostname == "controller")
+  notify:
+    - restart httpd
+  
+- name: controller 同步数据库01
+  shell: su -s /bin/sh -c "nova-manage api_db sync" nova
+  when: (ansible_hostname == "controller")
+  
+- name: controller 同步数据库02
+  shell: su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
+  when: (ansible_hostname == "controller")
+  
+- name: controller 同步数据库03
+  shell: su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
+  when: (ansible_hostname == "controller")
+  
+- name: controller 同步数据库04
+  shell: su -s /bin/sh -c "nova-manage db sync" nova
+  when: (ansible_hostname == "controller")
+  
+- name: controller 启动nova相关服务
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - openstack-nova-api
+    - openstack-nova-consoleauth
+    - openstack-nova-scheduler
+    - openstack-nova-conductor
+    - openstack-nova-novncproxy
+  when: (ansible_hostname == "controller")

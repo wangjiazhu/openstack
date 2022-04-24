@@ -1,0 +1,23 @@
+- include_tasks: keystone.yaml
+- include_tasks: httpd.yaml
+
+- name: controller 拷贝admin-rc密钥文件
+  copy:
+    src: admin-rc
+    dest: /root/admin-rc
+
+- name: controller 拷贝demo-rc密钥文件
+  copy:
+    src: demo-rc
+    dest: /root/demo-rc
+
+- name: controller 创建admin项目、用户和分配角色
+  script: /etc/ansible/roles/keystone/files/create_project_admin_role.sh
+  environment:
+    OS_USERNAME: admin
+    OS_PASSWORD: 123456
+    OS_PROJECT_NAME: admin
+    OS_USER_DOMAIN_NAME: Default
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_AUTH_URL: http://controller:35357/v3
+    OS_IDENTITY_API_VERSION: 3

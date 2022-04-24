@@ -1,0 +1,6 @@
+- include_tasks: chrony.yaml
+- include_tasks: mariadb.yaml
+- include_tasks: rabbitmq_server.yaml
+- include_tasks: memcached.yaml
+
+    

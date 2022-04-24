@@ -1,0 +1,23 @@
+- name: compute 安装nova服务组件
+  yum:
+    name: openstack-nova-compute
+  when: (ansible_hostname != "controller")
+
+- name: compute 修改配置文件/etc/nova/nova.conf
+  template:
+    src: compute_nova.conf
+    dest: /etc/nova/nova.conf
+    owner: root
+    group: nova
+    mode: '0640'
+  when: (ansible_hostname != "controller")
+
+- name: compute 启动nova相关服务
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - libvirtd
+    - openstack-nova-compute
+  when: (ansible_hostname != "controller")

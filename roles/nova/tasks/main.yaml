@@ -1,0 +1,18 @@
+- name: controller 创建nova用户、角色、服务实体
+  script: /etc/ansible/roles/nova/files/nova_project_user_role_api.sh
+  environment:
+    OS_USERNAME: admin
+    OS_PASSWORD: 123456
+    OS_PROJECT_NAME: admin
+    OS_USER_DOMAIN_NAME: Default
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_AUTH_URL: http://controller:35357/v3
+    OS_IDENTITY_API_VERSION: 3
+  when: (ansible_hostname == "controller")
+
+- include_tasks: controller_nova.yaml
+- include_tasks: compute_nova.yaml
+
+- name: controller 同步数据库
+  shell: su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+  when: (ansible_hostname == "controller")

@@ -1,0 +1,44 @@
+- name: compute 安装neutron相关组件
+  yum:
+    name: openstack-neutron-linuxbridge
+  when: (ansible_hostname != "controller")
+
+- name: compute修改配置文件/etc/neutron/neutron.conf
+  copy:
+    src: compute_neutron.conf
+    dest: /etc/neutron/neutron.conf
+    owner: root
+    group: neutron
+    mode: '0640'
+  when: (ansible_hostname != "controller")
+  
+- name: compute 修改配置文件/etc/neutron/plugins/ml2/linuxbridge_agent.ini
+  template:
+    src: compute_linuxbridge_agent.ini
+    dest: /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+    owner: root
+    group: neutron
+    mode: '0640'
+  when: (ansible_hostname != "controller")
+  
+- name: compute 修改配置文件/etc/nova/nova.conf
+  template:
+    src: compute_nova.conf
+    dest: /etc/nova/nova.conf
+    owner: root
+    group: nova
+    mode: '0640'
+  when: (ansible_hostname != "controller")
+
+- name: compute 重启openstack-nova-compute服务
+  systemd:
+    name: openstack-nova-compute
+    state: restarted
+  when: (ansible_hostname != "controller")
+
+- name: compute 启动neutron-linuxbridge-agent服务
+  systemd:
+    name: neutron-linuxbridge-agent
+    state: started
+    enabled: yes
+  when: (ansible_hostname != "controller")

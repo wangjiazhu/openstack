@@ -1,0 +1,19 @@
+- name: controller 安装openstack-dashboard软件包
+  yum:
+    name: openstack-dashboard
+
+- name: controller 修改配置文件/etc/openstack-dashboard/local_settings
+  copy:
+    src: local_settings
+    dest: /etc/openstack-dashboard/local_settings
+    owner: root
+    group: apache
+    mode: '0640'
+    
+- name: controller 修改配置文件/etc/httpd/conf.d/openstack-dashboard.conf
+  shell: sed -i '3a WSGIApplicationGroup %{GLOBAL}' /etc/httpd/conf.d/openstack-dashboard.conf
+
+- name: controller 重启httpd服务
+  systemd:
+    name: httpd
+    state: restarted

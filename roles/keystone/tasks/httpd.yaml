@@ -1,0 +1,11 @@
+- name: controller 修改配置文件/etc/httpd/conf/httpd.conf
+  shell: sed -i 's/#ServerName www.example.com:80/ServerName controller/g' /etc/httpd/conf/httpd.conf
+
+- name: controller 创建符号链接文件
+  command: ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
+
+- name: controller 启动Apache服务
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes

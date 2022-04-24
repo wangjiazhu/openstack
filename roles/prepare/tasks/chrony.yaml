@@ -1,0 +1,34 @@
+- name: 安装chrony时间同步
+  yum:
+    name: chrony
+    state: present
+
+- name: 修改controller节点时间同步配置文件/etc/chrony.conf
+  template:
+    src: server_chrony.conf
+    dest: /etc/chrony.conf
+    mode: '0644'
+  when: (ansible_hostname == "controller")
+
+- name: 修改compute节点时间同步配置文件/etc/chrony.conf
+  template:
+    src: client_chrony.conf
+    dest: /etc/chrony.conf
+    mode: '0644'
+  when: (ansible_hostname != "controller")
+
+- name: 启动chrony服务并设置开机自启
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes
+
+#- name: 验证chrony服务
+#  command: chronyc sources
+#  register: get_chrony
+
+#- name: 打印debug信息
+#  debug: msg={{get_chrony.stdout_lines}}
+  
+  
+  

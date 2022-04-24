@@ -1,0 +1,28 @@
+- name: controller 安装keystone相关软件
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - openstack-keystone
+      - httpd
+      - mod_wsgi
+
+- name: controller 修改配置文件/etc/keystone/keystone.conf
+  copy:
+    src: keystone.conf
+    dest: /etc/keystone/keystone.conf
+    owner: root
+    group: keystone
+    mode: '0640'
+
+- name: controller 初始化数据库
+  shell: su -s /bin/sh -c "keystone-manage db_sync" keystone
+  
+- name: controller 初始化fernet密钥
+  shell: keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+
+- name: controller 初始化fernet凭证
+  shell: keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+
+- name: controller 引导身份认证
+  shell: keystone-manage bootstrap --bootstrap-password 123456 --bootstrap-admin-url http://controller:35357/v3/ --bootstrap-internal-url http://controller:5000/v3/ --bootstrap-public-url http://controller:5000/v3/ --bootstrap-region-id RegionOne

@@ -1,0 +1,17 @@
+- name: controller节点安装 memcached python-memcached
+  yum:
+    name: ['memcached','python-memcached']
+  when: (ansible_hostname == "controller")
+
+- name: controller节点编辑配置文件 /etc/sysconfig/memcached
+  copy:
+    src: memcached
+    dest: /etc/sysconfig/memcached
+  when: (ansible_hostname == "controller")
+  
+- name: controller节点启动 memcached 服务
+  systemd:
+    name: memcached
+    state: started
+    enabled: yes
+  when: (ansible_hostname == "controller")

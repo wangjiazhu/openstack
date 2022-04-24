@@ -1,0 +1,49 @@
+- name: controller 创建glance用户、角色、服务实体
+  script: /etc/ansible/roles/glance/files/glance_project_user_role_api.sh
+  environment:
+    OS_USERNAME: admin
+    OS_PASSWORD: 123456
+    OS_PROJECT_NAME: admin
+    OS_USER_DOMAIN_NAME: Default
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_AUTH_URL: http://controller:35357/v3
+    OS_IDENTITY_API_VERSION: 3
+
+- name: controller 安装镜像服务软件
+  yum:
+    name: openstack-glance
+
+- name: controller 修改配置文件/etc/glance/glance-api.conf
+  copy:
+    src: glance-api.conf
+    dest: /etc/glance/glance-api.conf
+    owner: root
+    group: glance
+    mode: '0640'
+
+- name: controller 修改配置文件/etc/glance/glance-registry.conf
+  copy:
+    src: glance-registry.conf
+    dest: /etc/glance/glance-registry.conf
+    owner: root
+    group: glance
+    mode: '0640'
+
+- name: controller 同步数据库
+  shell: su -s /bin/sh -c "glance-manage db_sync" glance
+#  register: get_glance
+  
+#- name: controller 显示同步信息
+#  debug: msg={{ get_glance.stdout_lines }}
+  
+- name: controller 启动openstack-glance-api.service服务
+  systemd:
+    name: openstack-glance-api
+    state: started
+    enabled: yes
+
+- name: controller 启动openstack-glance-registry.service服务
+  systemd:
+    name: openstack-glance-registry
+    state: started
+    enabled: yes

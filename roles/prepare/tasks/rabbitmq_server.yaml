@@ -1,0 +1,20 @@
+- name: contriller节点安装消息队列服务 rabbitmq-server
+  yum:
+    name: rabbitmq-server
+    state: present
+  when: (ansible_hostname == "controller")
+  
+- name: contriller节点启动消息队列服务 rabbitmq-server
+  systemd:
+    name: rabbitmq-server
+    state: started
+    enabled: yes
+  when: (ansible_hostname == "controller")
+  
+- name: controller节点创建消息队列服务用户 openstack
+  shell: rabbitmqctl add_user openstack 123456
+  when: (ansible_hostname == "controller")
+  
+- name: controller节点授权消息队列服务用户 openstack
+  shell: rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+  when: (ansible_hostname == "controller")

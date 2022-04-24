@@ -1,0 +1,14 @@
+- name: controller 创建neutrn用户、角色、服务实体
+  script: /etc/ansible/roles/neutron/files/neutron_project_user_role_api.sh
+  environment:
+    OS_USERNAME: admin
+    OS_PASSWORD: 123456
+    OS_PROJECT_NAME: admin
+    OS_USER_DOMAIN_NAME: Default
+    OS_PROJECT_DOMAIN_NAME: Default
+    OS_AUTH_URL: http://controller:35357/v3
+    OS_IDENTITY_API_VERSION: 3
+  when: (ansible_hostname == "controller")
+  
+- include_tasks: controller_neutron.yaml
+- include_tasks: compute_neutron.yaml
