@@ -128,11 +128,15 @@ vim /etc/ansible/openstack/roles/prepare/vars/main.yaml
    ansible-playbook -C /etc/ansible/openstack/roles/site.yaml
    ```
 
+   ![image-20220424214247918](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214247918.png)
+
 2. 语法通过，执行剧本真正部署openstack
 
    ```bash
    ansible-playbook -v /etc/ansible/openstack/roles/site.yaml
    ```
+
+   ![image-20220424214329097](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214329097.png)
 
 
 
