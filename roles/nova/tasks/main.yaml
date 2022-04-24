@@ -1,5 +1,5 @@
 - name: controller 创建nova用户、角色、服务实体
-  script: /etc/ansible/roles/nova/files/nova_project_user_role_api.sh
+  script: /etc/ansible/openstack/roles/nova/files/nova_project_user_role_api.sh
   environment:
     OS_USERNAME: admin
     OS_PASSWORD: 123456

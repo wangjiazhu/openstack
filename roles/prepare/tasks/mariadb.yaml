@@ -26,10 +26,10 @@
   
 - name: controller节点设置mairadb密码
   script:
-    cmd: /etc/ansible/roles/prepare/files/mysql_secure_installation.sh
+    cmd: /etc/ansible/openstack/roles/prepare/files/mysql_secure_installation.sh
   when: (ansible_hostname == "controller")
 
 - name: 创建各组件用户以及对应的数据库
   script:
-    cmd: /etc/ansible/roles/prepare/files/create_database.sh
+    cmd: /etc/ansible/openstack/roles/prepare/files/create_database.sh
   when: (ansible_hostname == "controller")

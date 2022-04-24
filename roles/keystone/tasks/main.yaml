@@ -12,7 +12,7 @@
     dest: /root/demo-rc
 
 - name: controller 创建admin项目、用户和分配角色
-  script: /etc/ansible/roles/keystone/files/create_project_admin_role.sh
+  script: /etc/ansible/openstack/roles/keystone/files/create_project_admin_role.sh
   environment:
     OS_USERNAME: admin
     OS_PASSWORD: 123456

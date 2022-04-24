@@ -1,5 +1,5 @@
 - name: controller 创建glance用户、角色、服务实体
-  script: /etc/ansible/roles/glance/files/glance_project_user_role_api.sh
+  script: /etc/ansible/openstack/roles/glance/files/glance_project_user_role_api.sh
   environment:
     OS_USERNAME: admin
     OS_PASSWORD: 123456
