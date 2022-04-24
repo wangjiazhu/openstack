@@ -1,5 +1,5 @@
 [controller]
-202.207.240.110 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass='111111' ansible_su_pass='111111' ifname=ens34 ip_addr=202.207.240.110 hostname=controller 
+202.207.240.110 ansible_ssh_user=root ansible_ssh_pass='111111' ifname=ens34 ip_addr=202.207.240.110 hostname=controller 
 
 [compute]
 202.207.240.111 ifname=ens34 ip_addr=202.207.240.111 hostname=compute1
