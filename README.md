@@ -1,4 +1,4 @@
-# 使用ansible-playbook自动化部署openstack
+# 使用ansible-playbook自动化部署openstack-ocata
 
 ## openstack节点安排
 
