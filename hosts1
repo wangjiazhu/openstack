@@ -4,5 +4,3 @@
 [compute]
 202.207.240.111 ifname=ens34 ip_addr=202.207.240.111 hostname=compute1
 202.207.240.112 ifname=ens34 ip_addr=202.207.240.112 hostname=compute2
-202.207.240.113 ifname=ens34 ip_addr=202.207.240.113 hostname=compute3
-202.207.240.114 ifname=ens34 ip_addr=202.207.240.114 hostname=compute4
