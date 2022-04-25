@@ -1,4 +1,4 @@
-# 使用ansible-playbook自动化部署openstack-ocata
+# 使用ansible-playbook自动化部署openstack
 
 ## openstack节点安排
 
@@ -12,13 +12,40 @@
 
 ## 准备
 
-1. 按节点部署安排配置内外网卡IP、修改主机名、配置/etc/hosts主机名解析。【controller、compute】
-2. 配置openstack、CentOS7的yum源。【controller、compute】
-   注意：不要配置epel源，会出现rpm冲突。
+- 按节点部署安排配置内外网卡IP、修改主机名、配置/etc/hosts主机名解析和关闭防火墙等。【controller、compute】
+
+- 配置openstack、CentOS7的yum源。【controller、compute】
+  **注意：不要配置epel源，可能会出现rpm冲突。**
+1. 配置CentOS7的yum源
+```bash
+curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+```
+2. 配置OpenStack-Ocata的yum源
+```bash
+cat >/etc/yum.repos.d/openstack_ocata.repo <<EOF
+[ocata]
+name=openstack ocata
+baseurl=https://mirrors.aliyun.com/centos-vault/7.3.1611/cloud/x86_64/openstack-ocata/
+gpgcheck=0
+enabled=1
+EOF
+```
+3. 重新生成yum缓存
+
+```bash
+yum clean all && yum makecache
+```
+4. 检查ocata源
+
+```bash
+yum list |grep ocata
+```
+
+
 
 ## 安装并配置ansible
 
-【controller】或者单独的管理节点。
+【controller】
 
 ### 安装ansible
 
@@ -26,9 +53,10 @@
 
 1. 如果安装不上，临时配置epel源，完成ansible后立即删除epel源，避免rpm冲突。（ansible部署在controller节点）
 2. 如果ansible安装在单独的一个管理节点，配置CentOS7 和 epel源，直接安装，不用处理epel源。（建议ansible单独部署）
+3. ansible版本：ansible-2.9.27-1.el7.noarch
 
 ```bash
-yum install ansible -y
+yum install ansible-2.9.27 -y
 ```
 
 ### 下载openstack剧本
@@ -47,7 +75,7 @@ git clone https://github.com/wangjiazhu/openstack.git
 ```bash
 /bin/sh /etc/ansible/openstack/secret-free-login.sh
 ```
-![image-20220424195609671](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424195609671.png)
+![image-20220425215452757](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220425215452757.png)
 
 3. 验证ssh免密登录
 
@@ -63,7 +91,7 @@ git clone https://github.com/wangjiazhu/openstack.git
 
 ```bash
 rm -rf /etc/ansible/hosts
-cp /etc/ansible/openstack/hosts2 /etc/ansible/hosts
+cp /etc/ansible/openstack/hosts1 /etc/ansible/hosts
 ```
 
 ![image-20220424200639213](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424200639213.png)
@@ -72,7 +100,7 @@ cp /etc/ansible/openstack/hosts2 /etc/ansible/hosts
 
 ```
 [controller]
-202.207.240.110 ansible_ssh_user=root ansible_ssh_pass='111111' ifname=ens34 ip_addr=202.207.240.110 hostname=controller
+202.207.240.110 ifname=ens34 ip_addr=202.207.240.110 hostname=controller
 
 [compute]
 202.207.240.111 ifname=ens34 ip_addr=202.207.240.111 hostname=compute1
@@ -81,11 +109,9 @@ cp /etc/ansible/openstack/hosts2 /etc/ansible/hosts
 
 各个字段含义：
 
-```
+```bash
 [controller] 控制节点主机组名
 202.207.240.110 			 控制节点主机IP，表示controller主机组下的IP
-ansible_ssh_user=root  		  表示ssh用户，默认是root
-ansible_ssh_pass='111111' 	  表示ssh用户远程连接的密码
 ifname=ens34 				 表示内网的网卡，neutron配置文件需要的网卡名
 ip_addr=202.207.240.110 	  一个变量，用于表示本机的IP地址
 hostname=controller 		  一个变量，表示本地的主机名
@@ -105,12 +131,6 @@ ansible controller,compute -m command -a "uptime"
 ```
 
 ![image-20220424203639648](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424203639648.png)
-
-注意：出现以下报错不要慌，这是因为ansible部署在controller上，因此需要通过ssh密码方式连接本身，需要指纹,可以在controller通过ssh命令连接自身生成密码指纹即可。**(这就是推荐专门单独部署管理节点，进行ansible部署的原因)**
-
-![image-20220424203149239](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424203149239.png)
-
-![image-20220424203558870](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424203558870.png)
 
 ### 修改ntp时间同步网络段
 
