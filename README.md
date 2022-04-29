@@ -1,168 +1,107 @@
-# 使用ansible-playbook自动化部署openstack-ocata
+# ansible-playbook剧本自动化部署openstack-ocata
 
-## openstack节点安排
+#### openstack节点安排
 
-说明：以下给出示范。
+说明：以下给出示范
 
-|    节点    |   外网IP   |     内网IP      | 网卡名 |                    服务                    |      系统       |
-| :--------: | :--------: | :-------------: | :----: | :----------------------------------------: | :-------------: |
-| controller | 10.0.0.110 | 202.207.240.110 | ens34  | keystone、glance、nova、neutron、dashborad | CentOS 7.5.1804 |
-|  compute1  | 10.0.0.111 | 202.207.240.111 | ens34  |               nova、neutron                | CentOS 7.5.1804 |
-|  compute2  | 10.0.0.112 | 202.207.240.112 | ens34  |               nova、neutron                | CentOS 7.5.1804 |
+| 节点类型/主机名 |     管理IP      |   外网IP   |                    服务                    |      系统       | 备注 |
+| :-------------: | :-------------: | :--------: | :----------------------------------------: | :-------------: | :--: |
+|   controller    | 202.207.240.110 | 10.0.0.110 | keystone、glance、nova、neutron、dashborad | CentOS 7.5.1804 |      |
+|   controller    | 202.207.240.111 | 10.0.0.111 |               nova、neutron                | CentOS 7.5.1804 |      |
+|   controller    | 202.207.240.112 | 10.0.0.112 |               nova、neutron                | CentOS 7.5.1804 |      |
 
-## 准备
+#### 用户完成部分
 
-- 按节点部署安排配置内外网卡IP、修改主机名、配置/etc/hosts主机名解析和关闭防火墙等。【controller、compute】
+##### 网络设置
 
-- 配置openstack、CentOS7的yum源。【controller、compute】
-  **注意：不要配置epel源，可能会出现rpm冲突。**
-1. 配置CentOS7的yum源
-```bash
-curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
-```
-2. 配置OpenStack-Ocata的yum源
-```bash
-cat >/etc/yum.repos.d/openstack_ocata.repo <<EOF
-[ocata]
-name=openstack ocata
-baseurl=https://mirrors.aliyun.com/centos-vault/7.3.1611/cloud/x86_64/openstack-ocata/
-gpgcheck=0
-enabled=1
-EOF
-```
-3. 重新生成yum缓存
+​	用户按照自己的部署方案，在装好CentOS7.5.1804系统的主机上，配置好管理IP和外网IP。
 
-```bash
-yum clean all && yum makecache
-```
-4. 检查ocata源
+##### openstack主机清单列表
 
-```bash
-yum list |grep ocata
-```
+​	说明：用户从提供的网络地址下载“**openstack主机清单列表**”，按照用户自己的部署方案（假设以上openstack节点安排就是用户部署方案），将主机信息填写到“**OpenStack主机清单**”中，其填写说明见表格“**主机清单列表配置说明**”。
 
+###### 下载 “openstack主机清单列表” 表格
 
+说明：可以使用迅雷或者直接在浏览器中下载。
 
-## 安装并配置ansible
+下载地址：https://raw.githubusercontent.com/wangjiazhu/openstack/master/openstack主机清单列表.xlsx
 
-【controller】
+以下以qq浏览器为例下载该表格
 
-### 安装ansible
+ 1. 浏览器网址部分输入该下载地址，回车
 
-**注意：**
+    ![image-20220429210349390](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429210349390.png)
 
-1. 如果安装不上，临时配置epel源，完成ansible后立即删除epel源，避免rpm冲突。（ansible部署在controller节点）
-2. 如果ansible安装在单独的一个管理节点，配置CentOS7 和 epel源，直接安装，不用处理epel源。（建议ansible单独部署）
-3. ansible版本：ansible-2.9.27-1.el7.noarch
+    
 
-```bash
-yum install ansible-2.9.27 -y
-```
+ 2. 选择保存位置，点击下载
 
-### 下载openstack剧本
+    ![image-20220429210705403](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429210705403.png)
 
-1. 将整个openstack目录放在/etc/ansible/目录下。
+###### 配置OpenStack主机清单
 
+说明：桌面找到该表格，打开，该文件包含两张表
 
-```bash
-cd /etc/ansible
-git clone https://github.com/wangjiazhu/openstack.git
-```
-![image-20220424195248468](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424195248468.png)
+​	1. OpenStack主机清单
 
-2. 运行脚本配置免密登录。并验证
+![image-20220429211440788](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429211440788.png)
 
-```bash
-/bin/sh /etc/ansible/openstack/secret-free-login.sh
-```
-![image-20220425215452757](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220425215452757.png)
+2. 主机清单列表配置说明
 
-3. 验证ssh免密登录
+![image-20220429211731054](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429211731054.png)
 
+###### 用户提交表格
 
-   ```bash
-   ssh root@202.207.240.111
-   ssh root@202.207.240.112
-   ```
+用户按照自己的方案准备好CentOS主机，配置好网络，并填写完该表格，提交给运维部署人员。
 
-   ![image-20220424200001978](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424200001978.png)
+注意：接下来OpenStack所有的部署均以读该表格内容为前提进行自动化部署，需认真填写。
 
-4. 将/etc/ansible/openstack/hosts2 拷贝并覆盖 /etc/ansible/hosts
+#### 部署人员部分
+
+##### 准备部分
+
+1. 将存放剧本文件的目录openstack放在控制节点的任意目录下。（这里以根目录为例）
+
+   ![image-20220429215025525](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429215025525.png)
+
+2. 将用户提交的“openstack主机清单列表”放在openstack目录中。
+
+![image-20220429215204913](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429215204913.png)
+
+##### 部署过程
+
+1. 进入到openstack剧本目录，执行脚本prepare_install.sh
 
 ```bash
-rm -rf /etc/ansible/hosts
-cp /etc/ansible/openstack/hosts1 /etc/ansible/hosts
+sh prepare_install.sh
 ```
 
-![image-20220424200639213](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424200639213.png)
+![image-20220429220110252](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429220110252.png)
 
-5. 配置ansible主机列表清单/etc/ansible/hosts
+执行完毕后，根目录多出一个安装目录 /openstack_distro
 
-```
-[controller]
-202.207.240.110 ifname=ens34 ip_addr=202.207.240.110 hostname=controller
+![image-20220429220447641](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429220447641.png)
 
-[compute]
-202.207.240.111 ifname=ens34 ip_addr=202.207.240.111 hostname=compute1
-202.207.240.112 ifname=ens34 ip_addr=202.207.240.112 hostname=compute2
-```
 
-各个字段含义：
+2. 进入到 /openstack_distro 目录，执行脚本 deployment.sh
 
 ```bash
-[controller] 控制节点主机组名
-202.207.240.110 			 控制节点主机IP，表示controller主机组下的IP
-ifname=ens34 				 表示内网的网卡，neutron配置文件需要的网卡名
-ip_addr=202.207.240.110 	  一个变量，用于表示本机的IP地址
-hostname=controller 		  一个变量，表示本地的主机名
-
-[compute]   计算节点主机组名
-202.207.240.111				 控制节点主机IP，表示compute主机组下的主机IP
-ifname=ens34 				 表示内网的网卡，neutron配置文件需要的网卡名
-ip_addr=202.207.240.111 	  一个变量，用于表示本机的IP地址
-hostname=compute1 		      一个变量，表示本地的主机名
-
+cd /openstack_distro
+sh deployment.sh
 ```
 
-6. 验证ansible主机清单是否配置成功
+![image-20220429221346796](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429221346796.png)
+
+3. 按照以上脚本执行完毕后给的提示，进行验证剧本语法以及部署openstack
 
 ```bash
-ansible controller,compute -m command -a "uptime"
+# 检查剧本语法
+ansible-playbook -C /etc/ansible/openstack/roles/site.yaml
+
+# 运行剧本，部署openstack
+ansible-playbook -v /etc/ansible/openstack/roles/site.yaml
 ```
 
-![image-20220424203639648](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424203639648.png)
+![](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214247918.png)
 
-### 修改ntp时间同步网络段
-
-```bash
-vim /etc/ansible/openstack/roles/prepare/vars/main.yaml
-```
-
-![image-20220424204014790](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424204014790.png)
-
-### 检查剧本语法以并完成openstack部署
-
-1. 预执行剧本，检查剧本语法
-
-   ```bash
-   ansible-playbook -C /etc/ansible/openstack/roles/site.yaml
-   ```
-
-   ![image-20220424214247918](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214247918.png)
-
-2. 语法通过，执行剧本真正部署openstack
-
-   ```bash
-   ansible-playbook -v /etc/ansible/openstack/roles/site.yaml
-   ```
-
-   ![image-20220424214329097](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214329097.png)
-
-
-
-
-
-附：
-
-视频教程：https://www.bilibili.com/video/BV1NF411g7TP?t=443.5
-
+![](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214329097.png)
