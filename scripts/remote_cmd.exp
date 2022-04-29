@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+if { $argc != 3 } {
+    puts "USAGE: expect $argv0 host password cmd"
+    exit
+}
+
+# define var
+set ip [lindex $argv 0]
+set password [lindex $argv 1]
+set cmd [lindex $argv 2]
+set timeout -1
+
+spawn ssh root@$ip $cmd
+
+expect {
+    "yes/no"    { send "yes\r";exp_continue }
+    "*password" { send "$password\r" }
+}
+expect eof

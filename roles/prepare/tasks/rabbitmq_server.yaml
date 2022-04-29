@@ -1,10 +1,10 @@
-- name: contriller节点安装消息队列服务 rabbitmq-server
+- name: controller节点安装消息队列服务 rabbitmq-server
   yum:
     name: rabbitmq-server
     state: present
   when: (ansible_hostname == "controller")
   
-- name: contriller节点启动消息队列服务 rabbitmq-server
+- name: controller节点启动消息队列服务 rabbitmq-server
   systemd:
     name: rabbitmq-server
     state: started
