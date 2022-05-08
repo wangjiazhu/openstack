@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import sys
+
 # 获取NTP时间同步网络段
 class ntp_network:
     def __init__(self, ip_mask):
@@ -31,6 +33,7 @@ class ntp_network:
         network_ip = self.parse_ip(network_num)
         return f"{network_ip}/{netmask_bit}"
 
-if __name__ == '__main__':
-    ntpnetwork = ntp_network("202.207.240.110/24").get_ntpNetworkMask()
-    print(ntpnetwork)
+# 获取ip_mask值
+ip_mask = sys.argv[1]
+ntpnetwork = ntp_network(ip_mask).get_ntpNetworkMask()
+print(ntpnetwork)

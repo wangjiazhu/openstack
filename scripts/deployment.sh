@@ -51,7 +51,8 @@ fi
 cd - &>/dev/null
 
 # config ntpdate network
-manage_ip=$(grep "hostname=controller" $ANSIBLE_DIR/hosts |awk '{print $1}')
+#manage_ip=$(grep "hostname=controller" $ANSIBLE_DIR/hosts |awk '{print $1}')
+manage_ip=$(grep -w "controller" /etc/hosts|awk '{print $1}')
 ip_mask=$(ip addr|grep "$manage_ip" |awk '{print $2}')
 ntp_network=$(/usr/bin/python3 ./scripts/ntp_network.py $ip_mask)
 #sed -i '2d' /etc/ansible/roles/prepare/vars/main.yaml
