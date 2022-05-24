@@ -45,7 +45,7 @@ def config_ansible_hosts(table):
         #print(cmd)
         ip_ifname = str_msg[len(str_msg)-1].strip().split()
         #print(ip_ifname)
-        host_msg = f"{table[i][manage_ip]} ifname={ip_ifname[len(ip_ifname)-1]} ip_addr={table[i][manage_ip]} hostname={table[i][hostname]}"
+        host_msg = f"{table[i][manage_ip]} ifname={ip_ifname[len(ip_ifname)-1]} manage_ip={table[i][manage_ip]} provider_ip={table[i][provider_ip]} hostname={table[i][hostname]}"
         #print(host_msg)
         if table[i][hostname] == "controller":
             os.popen(f"sed -i \'1a {host_msg}\' /etc/ansible/hosts")
