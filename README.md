@@ -20,35 +20,11 @@
 
 ​	说明：用户从提供的网络地址下载“**openstack主机清单列表**”，按照用户自己的部署方案（假设以上openstack节点安排就是用户部署方案），将主机信息填写到“**OpenStack主机清单**”中，其填写说明见表格“**主机清单列表配置说明**”。
 
-###### 下载 “openstack主机清单列表” 表格
+###### 下载 
 
 说明：可以使用迅雷或者直接在浏览器中下载。
 
 下载地址：https://raw.githubusercontent.com/wangjiazhu/openstack/master/openstack主机清单列表.xlsx
-
-以下以qq浏览器为例下载该表格
-
- 1. 浏览器网址部分输入该下载地址，回车
-
-    ![image-20220429210349390](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429210349390.png)
-
-    
-
- 2. 选择保存位置，点击下载
-
-    ![image-20220429210705403](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429210705403.png)
-
-###### 配置OpenStack主机清单
-
-说明：桌面找到该表格，打开，该文件包含两张表
-
-​	1. OpenStack主机清单
-
-![image-20220429211440788](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429211440788.png)
-
-2. 主机清单列表配置说明
-
-![image-20220429211731054](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429211731054.png)
 
 ###### 用户提交表格
 
@@ -62,11 +38,11 @@
 
 1. 将存放剧本文件的目录openstack放在控制节点的任意目录下。（这里以根目录为例）
 
-   ![image-20220429215025525](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429215025525.png)
+   ![image-20220429215025525](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220429215025525.png)
 
 2. 将用户提交的“openstack主机清单列表”放在openstack目录中。
 
-![image-20220429215204913](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429215204913.png)
+![image-20220429215204913](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220429215204913.png)
 
 ##### 部署过程
 
@@ -76,11 +52,11 @@
 sh prepare_install.sh
 ```
 
-![image-20220429220110252](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429220110252.png)
+![image-20220429220110252](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220429220110252.png)
 
 执行完毕后，根目录多出一个安装目录 /openstack_distro
 
-![image-20220429220447641](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429220447641.png)
+![image-20220429220447641](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220429220447641.png)
 
 
 2. 进入到 /openstack_distro 目录，执行脚本 deployment.sh
@@ -90,7 +66,7 @@ cd /openstack_distro
 sh deployment.sh
 ```
 
-![image-20220429221346796](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220429221346796.png)
+![image-20220429221346796](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220429221346796.png)
 
 3. 按照以上脚本执行完毕后给的提示，进行验证剧本语法以及部署openstack
 
@@ -102,6 +78,6 @@ ansible-playbook -C /etc/ansible/openstack/roles/site.yaml
 ansible-playbook -v /etc/ansible/openstack/roles/site.yaml
 ```
 
-![](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214247918.png)
+![](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220424214247918.png)
 
-![](https://gitee.com/wjzhuf/mark-text-img/raw/master/imgbed/image-20220424214329097.png)
+![](https://raw.githubusercontent.com/wjzcscloud/MarkTextImg/master/image-20220424214329097.png)
